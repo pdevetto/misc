@@ -1,0 +1,4 @@
+*/config.ini
+*/local-*
+.ipynb_checkpoints
+__pycache__
