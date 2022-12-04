@@ -36,7 +36,7 @@ def d041( data):
     print(contained)
         
 #d041(data_exemple)
-#d041(readfile("day04.txt"))
+#d041(readfile("d04.txt"))
 
 def overlap(a,b,x,y):
     return (int(a) >= int(x) and int(a) <= int(y)) or (int(b) >= int(x) and int(b) <= int(y)) or isin(x,y,a,b)
@@ -46,11 +46,9 @@ def d042( data):
     for line in data:
         pattern = ',|-'
         a,b,x,y = re.split(pattern, line)
-        print(a,b,x,y)
         if overlap(a,b,x,y):
             overlapped += 1
-            print("==> Overlap")
     print(overlapped)
 
 d042(data_exemple)
-d042(readfile("day04.txt"))
+d042(readfile("d04.txt"))
