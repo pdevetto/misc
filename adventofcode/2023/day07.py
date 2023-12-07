@@ -50,13 +50,8 @@ assert hand_value('32T3K 765') == 'B0302100313 765'
 assert hand_value('T55J5 684') == 'D1005051105 684'
 
 def day07(data):
-    data = list(map(hand_value,data))
-    data = sorted(data)
-    gain = 0
-    for i, hand_valued in enumerate(data):
-        gain += (i+1) * int(hand_valued[12:])
-    print(gain)
-    return gain
+    data = sorted(list(map(hand_value,data)))
+    return sum([ (i+1)*int(hand_valued[12:]) for i,hand_valued in enumerate(data)]) 
 
 def hand_type_joker(hand):
     counter = dict(collections.Counter(hand[0:5].replace('J', '')))
@@ -116,14 +111,8 @@ assert hand_value_joker('32T3K 765') == 'B0302100313 765'
 assert hand_value_joker('T55J5 684') == 'F1005050005 684'
 
 def day07_b(data):
-    data = list(map(hand_value_joker,data))
-    data = sorted(data)
-    gain = 0
-    for i, hand_valued in enumerate(data):
-        gain += (i+1) * int(hand_valued[12:])
-    print(gain)
-    return gain
-    pass
+    data = sorted(list(map(hand_value_joker,data)))
+    return sum([ (i+1)*int(hand_valued[12:]) for i,hand_valued in enumerate(data)])
 
 assert day07(data_ex) == 6440
 start = time.time()
