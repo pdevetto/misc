@@ -25,21 +25,29 @@ var (
 	}
 )
 
+type Step int
+
+const (
+	start Step = iota
+	roll
+)
+
 type Dice struct {
 	value int
 	lock  int
 }
 type Score struct {
-	label string
-	key   string
-	lock  bool
-	set   bool
-	value int
+	label  string
+	key    string
+	lock   bool
+	set    bool
+	value  int
+	precal string
 }
 type Party struct {
 	dices  *[5]Dice
 	scores map[string]*Score
-	step   string
+	step   Step
 	roll   int
 }
 
@@ -47,11 +55,11 @@ func CreateParty() *Party {
 	p := Party{
 		&[5]Dice{},
 		make(map[string]*Score),
-		"init",
+		start,
 		0,
 	}
 	for _, k := range Keys {
-		p.scores[k] = &Score{Labels[k], k, k == "dpm" || k == "tt1" || k == "tt2" || k == "bon" || k == "tot", false, 0}
+		p.scores[k] = &Score{Labels[k], k, k == "dpm" || k == "tt1" || k == "tt2" || k == "bon" || k == "tot", false, 0, "   "}
 	}
 	return &p
 }

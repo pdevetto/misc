@@ -10,6 +10,7 @@ func main() {
 
 	p := party.CreateParty()
 	p.PlayCLI()
+
 	//bubblecli.PlayBubbleTea()
 
 }
