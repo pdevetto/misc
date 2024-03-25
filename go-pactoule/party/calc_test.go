@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-func genDices(dd []int) []Dice {
-	dices := []Dice{}
+func genDices(dd []int) []*Dice {
+	dices := []*Dice{}
 	for _, i := range dd {
-		dices = append(dices, Dice{i, 0})
+		dices = append(dices, &Dice{i, 0})
 	}
 	return dices
 }

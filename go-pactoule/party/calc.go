@@ -15,7 +15,13 @@ func (p *Party) Precalc() {
 	}
 }
 
-func nDice(dices []Dice, n int) bool {
+func Compute(key string, d []*Dice) int {
+	fmt.Printf("Compute it is %#v for key %v\n", d, key)
+	fun := funcalc[key]
+	return fun(d)
+}
+
+func nDice(dices Dices, n int) bool {
 	fmt.Printf("\n Do %v for %v", dices, n)
 	values := make(map[int]int)
 	for _, dice := range dices {
@@ -28,7 +34,7 @@ func nDice(dices []Dice, n int) bool {
 	return false
 }
 
-func sumDice(dices []Dice) int {
+func sumDice(dices Dices) int {
 	fmt.Printf("SUM : %v = ", dices)
 	n := 0
 	for _, dice := range dices {
@@ -38,7 +44,7 @@ func sumDice(dices []Dice) int {
 	return n
 }
 
-func sumDiceOfK(dices []Dice, k int) int {
+func sumDiceOfK(dices Dices, k int) int {
 	fmt.Printf("SUM of K")
 	n := 0
 	for _, dice := range dices {
@@ -50,7 +56,7 @@ func sumDiceOfK(dices []Dice, k int) int {
 	return n
 }
 
-func suiteDice(dices []Dice, n int) bool {
+func suiteDice(dices Dices, n int) bool {
 	v_keys := map[int]int{}
 	v_vals := make([]int, 0)
 	for _, d := range dices {
@@ -65,75 +71,75 @@ func suiteDice(dices []Dice, n int) bool {
 		(len(v_keys) == n+1 && slices.Max(v_vals)-slices.Min(v_vals) == n)
 }
 
-var funcalc = map[string]func(dices *[5]Dice) int{
-	"bre": func(dices *[5]Dice) int {
+var funcalc = map[string]func(dices Dices) int{
+	"bre": func(dices Dices) int {
 		fmt.Println("BRELAN")
 		if nDice(dices[:], 3) {
 			return sumDice(dices[:])
 		}
 		return 0
 	},
-	"car": func(dices *[5]Dice) int {
+	"car": func(dices Dices) int {
 		fmt.Println("CARRE")
 		if nDice(dices[:], 4) {
 			return sumDice(dices[:])
 		}
 		return 0
 	},
-	"ful": func(dices *[5]Dice) int {
+	"ful": func(dices Dices) int {
 		fmt.Println("PACFULL")
 		if nDice(dices[:], 3) { // TODO
 			return 25
 		}
 		return 0
 	},
-	"psu": func(dices *[5]Dice) int {
+	"psu": func(dices Dices) int {
 		fmt.Println("PSU")
 		if suiteDice(dices[:], 4) {
 			return 30
 		}
 		return 0
 	},
-	"gsu": func(dices *[5]Dice) int {
+	"gsu": func(dices Dices) int {
 		fmt.Println("PSU")
 		if suiteDice(dices[:], 5) {
 			return 40
 		}
 		return 0
 	},
-	"cha": func(dices *[5]Dice) int {
+	"cha": func(dices Dices) int {
 		fmt.Println("CHANCE")
 		return sumDice(dices[:])
 	},
-	"pac": func(dices *[5]Dice) int {
+	"pac": func(dices Dices) int {
 		fmt.Println("PACTOULE")
 		if nDice(dices[:], 5) {
 			return 50
 		}
 		return 0
 	},
-	"dc1": func(dices *[5]Dice) int {
+	"dc1": func(dices Dices) int {
 		fmt.Println("DICE:1")
-		return sumDiceOfK(dices[:], 1)
+		return sumDiceOfK(dices, 1)
 	},
-	"dc2": func(dices *[5]Dice) int {
+	"dc2": func(dices Dices) int {
 		fmt.Println("DICE:2")
-		return sumDiceOfK(dices[:], 2)
+		return sumDiceOfK(dices, 2)
 	},
-	"dc3": func(dices *[5]Dice) int {
+	"dc3": func(dices Dices) int {
 		fmt.Println("DICE:3")
-		return sumDiceOfK(dices[:], 3)
+		return sumDiceOfK(dices, 3)
 	},
-	"dc4": func(dices *[5]Dice) int {
+	"dc4": func(dices Dices) int {
 		fmt.Println("DICE:4")
-		return sumDiceOfK(dices[:], 4)
+		return sumDiceOfK(dices, 4)
 	},
-	"dc5": func(dices *[5]Dice) int {
+	"dc5": func(dices Dices) int {
 		fmt.Println("DICE:5")
-		return sumDiceOfK(dices[:], 5)
+		return sumDiceOfK(dices, 5)
 	},
-	"dc6": func(dices *[5]Dice) int {
+	"dc6": func(dices Dices) int {
 		fmt.Println("DICE:6")
-		return sumDiceOfK(dices[:], 6)
+		return sumDiceOfK(dices, 6)
 	},
 }

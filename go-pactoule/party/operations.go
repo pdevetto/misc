@@ -3,39 +3,52 @@ package party
 import (
 	"fmt"
 	"log"
-	"math/rand/v2"
 
 	"github.com/fatih/color"
 	"github.com/mattn/go-tty"
 )
 
-func (p *Party) Print() {
-	dices := ""
-	for _, d := range p.dices {
-		if d.lock != 0 {
-			dices += fmt.Sprintf("[%v]", d.value)
-		} else {
-			dices += fmt.Sprintf(" %v ", d.value)
-		}
-
-	}
-	fmt.Printf("🎲 : %v \n", dices)
-	fmt.Println("_____")
+func (p *Party) Print() string {
+	output := "\n_________________________________________\n"
 	for i := range 8 {
 		s1 := p.scores[Keys[i]]
 		s2 := p.scores[Keys[i+9]]
 		if !s1.set && !s1.lock {
-			fmt.Printf("(%v) | %-9v | %v |", s1.key, s1.label, s1.precal)
+			output += fmt.Sprintf("| %-9v | %v |", s1.label, s1.precal)
 		} else {
-			fmt.Printf("      | %-9v | %3d |", s1.label, s1.value)
+			output += fmt.Sprintf("| %-9v | %3d |", s1.label, s1.value)
 		}
 		if !s2.set && !s2.lock {
-			fmt.Printf("| %-9v | %s | (%v)\n", s2.label, s2.precal, s2.key)
+			output += fmt.Sprintf("| %-9v | %s |\n", s2.label, s2.precal)
 		} else {
-			fmt.Printf("| %-9v | %3d |\n", s2.label, s2.value)
+			output += fmt.Sprintf("| %-9v | %3d |\n", s2.label, s2.value)
 		}
-
 	}
+	output += "--------------------------------------------\n"
+	dicestring := generateDices(p.dices)
+
+	for _, d := range dicestring {
+		output += d + "\n"
+	}
+	return output
+}
+
+func generateDices(dices Dices) [3]string {
+	// ═ ║ ┌╖╘╝│─
+	diceoutput := [3]string{}
+	for _, d := range dices {
+		if d.value != 0 {
+			lockprint := func(s string) string { return s }
+			if d.lock != 0 {
+				lockprint = func(s string) string { return color.HiRedString(s) }
+			}
+
+			diceoutput[0] = diceoutput[0] + "  " + lockprint("┌──╖")
+			diceoutput[1] = diceoutput[1] + "  " + lockprint(fmt.Sprintf("│ %d║", d.value))
+			diceoutput[2] = diceoutput[2] + "  " + lockprint("╘══╝")
+		}
+	}
+	return diceoutput
 }
 
 func (p *Party) PlayCLI() {
@@ -47,9 +60,8 @@ func (p *Party) PlayCLI() {
 	char, _ := tty.ReadRune()
 	fmt.Println(char)
 
-	cmd := ""
 	for {
-		p.Print()
+		fmt.Printf("%s\n", p.Print())
 		fmt.Println("\n*******************")
 		color.Green(p.GetCMD())
 		fmt.Println(">")
@@ -72,21 +84,15 @@ func (p *Party) PlayCLI() {
 		case 'q':
 			return
 		case '1', '2', '3', '4', '5', 'a', 'z', 'e', 'r', 't':
-			if err := p.Keep(char); err != nil {
+			if err := p.KeepRune(char); err != nil {
 				fmt.Printf("⚠️ %v\n", err)
 			}
 		case 's':
-			fmt.Printf("key ? > \n")
-			_, err := fmt.Scan(&cmd)
-			if err != nil {
-				fmt.Printf("Command broken : %v\n", cmd)
-			}
-			err = p.Mark(cmd)
-			if err != nil {
-				fmt.Printf("Command broken : %v\n", cmd)
+			if err := p.MarkRune(tty); err != nil {
+				fmt.Printf("⚠️ %v\n", err)
 			}
 		default:
-			fmt.Printf("You pressed: %q\r\n", char)
+			fmt.Printf("⌨️ You pressed: %q", char)
 		}
 	}
 }
@@ -97,34 +103,7 @@ func (p *Party) GetCMD() string {
 	return cmd
 }
 
-func (p *Party) Roll() error {
-	if (p.step != start && p.step != roll) || p.roll > 2 {
-		return fmt.Errorf("can't roll on step %v (roll %v)", p.step, p.roll)
-	}
-	precalc := false
-	fmt.Printf("...<roll%d>\n", p.roll+1)
-
-	for i, dice := range p.dices {
-		if p.step == start {
-			p.dices[i].lock = 0
-		}
-		if dice.lock == 0 {
-			p.dices[i].value = rand.IntN(5) + 1
-			precalc = precalc || true
-		}
-	}
-
-	p.step = roll
-	p.roll += 1
-
-	if precalc {
-		p.Precalc()
-	}
-
-	return nil
-}
-
-func (p *Party) Keep(dice rune) error {
+func (p *Party) KeepRune(dice rune) error {
 	if p.step != roll {
 		return fmt.Errorf("NOT THE RIGHT TIME TO KEEP")
 	}
@@ -143,18 +122,49 @@ func (p *Party) Keep(dice rune) error {
 	default:
 		return fmt.Errorf("WTF BRO")
 	}
-	fmt.Printf("so: %v \n", dice)
-
-	if p.dices[di].lock == 0 {
-		p.dices[di].lock = p.roll
-	} else if p.dices[di].lock == p.roll {
-		p.dices[di].lock = 0
-	}
-
+	p.Keep(di)
 	return nil
 }
 
-func (p *Party) Mark(cmd string) error {
-	//p.step =
+func (p *Party) MarkRune(tty *tty.TTY) error {
+	if p.step != roll {
+		return fmt.Errorf("NOT THE RIGHT TIME TO MARK")
+	}
+	fmt.Println("\n*******************")
+	color.Green(" 1-6 | b:bre | c:car | f:ful | s:psu | g:gsu | h:cha | p:pac")
+	fmt.Println("Where >")
+	scored := false
+	for !scored {
+		char, err := tty.ReadRune()
+		if err != nil {
+			panic(err)
+		}
+		subcmd := ""
+		switch char {
+		case '1', '2', '3', '4', '5', '6':
+			subcmd = fmt.Sprintf("dc%s", string(char))
+		case 'b':
+			subcmd = "bre"
+		case 'c':
+			subcmd = "car"
+		case 'f':
+			subcmd = "ful"
+		case 's':
+			subcmd = "psu"
+		case 'g':
+			subcmd = "gsu"
+		case 'p':
+			subcmd = "pac"
+		default:
+			fmt.Println("print %v", char)
+		}
+		if subcmd != "" {
+			err := p.Mark(subcmd)
+			if err != nil {
+				fmt.Printf("⚠️ couldn' mark : %v -> %v \n", err, subcmd)
+			}
+			scored = true
+		}
+	}
 	return nil
 }
