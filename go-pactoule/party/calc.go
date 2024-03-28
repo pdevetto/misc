@@ -3,56 +3,57 @@ package party
 import (
 	"fmt"
 	"slices"
-
-	"github.com/fatih/color"
 )
 
 func (p *Party) Precalc() {
 	for _, s := range p.scores {
-		if !s.set && !s.lock {
-			p.scores[s.key].precal = color.RedString(fmt.Sprintf("%3d", funcalc[s.key](p.dices)))
+		if !s.Set && !s.Lock {
+			p.scores[s.Key].Precal = funcalc[s.Key](p.dices)
 		}
 	}
 }
 
-func Compute(key string, d []*Dice) int {
+func Compute(key Key, d []*Dice) int {
 	fmt.Printf("Compute it is %#v for key %v\n", d, key)
 	fun := funcalc[key]
 	return fun(d)
 }
 
 func nDice(dices Dices, n int) bool {
-	fmt.Printf("\n Do %v for %v", dices, n)
 	values := make(map[int]int)
 	for _, dice := range dices {
-		values[dice.value] = values[dice.value] + 1
-		print(" h:", values[dice.value])
-		if values[dice.value] == n {
+		values[dice.Value] = values[dice.Value] + 1
+		if values[dice.Value] == n {
 			return true
 		}
 	}
 	return false
 }
 
+func differentDices(dices Dices) int {
+	diff_dice := make(map[int]int)
+	for _, dice := range dices {
+		n := dice.Value
+		diff_dice[n] = diff_dice[n] + 1
+	}
+	return len(diff_dice)
+}
+
 func sumDice(dices Dices) int {
-	fmt.Printf("SUM : %v = ", dices)
 	n := 0
 	for _, dice := range dices {
-		n += dice.value
+		n += dice.Value
 	}
-	fmt.Printf(" %v ", n)
 	return n
 }
 
 func sumDiceOfK(dices Dices, k int) int {
-	fmt.Printf("SUM of K")
 	n := 0
 	for _, dice := range dices {
-		if dice.value == k {
-			n += dice.value
+		if dice.Value == k {
+			n += dice.Value
 		}
 	}
-	fmt.Printf(" %v ", n)
 	return n
 }
 
@@ -60,86 +61,80 @@ func suiteDice(dices Dices, n int) bool {
 	v_keys := map[int]int{}
 	v_vals := make([]int, 0)
 	for _, d := range dices {
-		v_keys[d.value] += 1
-		v_vals = append(v_vals, d.value)
+		v_keys[d.Value] += 1
+		v_vals = append(v_vals, d.Value)
 	}
-
-	//fmt.Printf("???Suite %v  \n", dices)
-	//fmt.Printf("len(k) %v min : %v max %v \n", len(v_keys), slices.Min(v_vals), slices.Max(v_vals))
-
-	return (len(v_keys) == n && slices.Max(v_vals)-slices.Min(v_vals) == n-1) ||
-		(len(v_keys) == n+1 && slices.Max(v_vals)-slices.Min(v_vals) == n)
+	if len(v_keys) < n {
+		return false
+	}
+	if len(v_keys) == n {
+		return slices.Max(v_vals)-slices.Min(v_vals) == n-1
+	}
+	for i := range len(v_keys) - n + 1 {
+		if slices.Max(v_vals[i:i+n])-slices.Min(v_vals[i:i+n]) == n-1 {
+			return true
+		}
+	}
+	return false
 }
 
-var funcalc = map[string]func(dices Dices) int{
-	"bre": func(dices Dices) int {
-		fmt.Println("BRELAN")
+var funcalc = map[Key]func(dices Dices) int{
+	bre: func(dices Dices) int {
 		if nDice(dices[:], 3) {
 			return sumDice(dices[:])
 		}
 		return 0
 	},
-	"car": func(dices Dices) int {
-		fmt.Println("CARRE")
+	car: func(dices Dices) int {
 		if nDice(dices[:], 4) {
 			return sumDice(dices[:])
 		}
 		return 0
 	},
-	"ful": func(dices Dices) int {
-		fmt.Println("PACFULL")
-		if nDice(dices[:], 3) { // TODO
+	ful: func(dices Dices) int {
+		if nDice(dices[:], 5) ||
+			(differentDices(dices[:]) == 2 && !nDice(dices[:], 4)) { // TODO
 			return 25
 		}
 		return 0
 	},
-	"psu": func(dices Dices) int {
-		fmt.Println("PSU")
+	psu: func(dices Dices) int {
 		if suiteDice(dices[:], 4) {
 			return 30
 		}
 		return 0
 	},
-	"gsu": func(dices Dices) int {
-		fmt.Println("PSU")
+	gsu: func(dices Dices) int {
 		if suiteDice(dices[:], 5) {
 			return 40
 		}
 		return 0
 	},
-	"cha": func(dices Dices) int {
-		fmt.Println("CHANCE")
+	cha: func(dices Dices) int {
 		return sumDice(dices[:])
 	},
-	"pac": func(dices Dices) int {
-		fmt.Println("PACTOULE")
+	pac: func(dices Dices) int {
 		if nDice(dices[:], 5) {
 			return 50
 		}
 		return 0
 	},
-	"dc1": func(dices Dices) int {
-		fmt.Println("DICE:1")
+	dc1: func(dices Dices) int {
 		return sumDiceOfK(dices, 1)
 	},
-	"dc2": func(dices Dices) int {
-		fmt.Println("DICE:2")
+	dc2: func(dices Dices) int {
 		return sumDiceOfK(dices, 2)
 	},
-	"dc3": func(dices Dices) int {
-		fmt.Println("DICE:3")
+	dc3: func(dices Dices) int {
 		return sumDiceOfK(dices, 3)
 	},
-	"dc4": func(dices Dices) int {
-		fmt.Println("DICE:4")
+	dc4: func(dices Dices) int {
 		return sumDiceOfK(dices, 4)
 	},
-	"dc5": func(dices Dices) int {
-		fmt.Println("DICE:5")
+	dc5: func(dices Dices) int {
 		return sumDiceOfK(dices, 5)
 	},
-	"dc6": func(dices Dices) int {
-		fmt.Println("DICE:6")
+	dc6: func(dices Dices) int {
 		return sumDiceOfK(dices, 6)
 	},
 }
