@@ -12,7 +12,7 @@ var (
 		cha: "Chance",
 		pac: "Pactoule",
 		dpm: "DPM",
-		tt1: "Tot 1",
+		tt1: "Subtot 1",
 		dc1: "Uns",
 		dc2: "Deux",
 		dc3: "Trois",
@@ -20,7 +20,7 @@ var (
 		dc5: "Cinq",
 		dc6: "Six",
 		bon: "Bonus",
-		tt2: "Total 2",
+		tt2: "Subtot 2",
 		tot: "Total",
 	}
 )
