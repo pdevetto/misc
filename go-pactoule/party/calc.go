@@ -79,62 +79,62 @@ func suiteDice(dices Dices, n int) bool {
 }
 
 var funcalc = map[Key]func(dices Dices) int{
-	bre: func(dices Dices) int {
+	Bre: func(dices Dices) int {
 		if nDice(dices[:], 3) {
 			return sumDice(dices[:])
 		}
 		return 0
 	},
-	car: func(dices Dices) int {
+	Car: func(dices Dices) int {
 		if nDice(dices[:], 4) {
 			return sumDice(dices[:])
 		}
 		return 0
 	},
-	ful: func(dices Dices) int {
+	Ful: func(dices Dices) int {
 		if nDice(dices[:], 5) ||
 			(differentDices(dices[:]) == 2 && !nDice(dices[:], 4)) { // TODO
 			return 25
 		}
 		return 0
 	},
-	psu: func(dices Dices) int {
+	Psu: func(dices Dices) int {
 		if suiteDice(dices[:], 4) {
 			return 30
 		}
 		return 0
 	},
-	gsu: func(dices Dices) int {
+	Gsu: func(dices Dices) int {
 		if suiteDice(dices[:], 5) {
 			return 40
 		}
 		return 0
 	},
-	cha: func(dices Dices) int {
+	Cha: func(dices Dices) int {
 		return sumDice(dices[:])
 	},
-	pac: func(dices Dices) int {
+	Pac: func(dices Dices) int {
 		if nDice(dices[:], 5) {
 			return 50
 		}
 		return 0
 	},
-	dc1: func(dices Dices) int {
+	Dc1: func(dices Dices) int {
 		return sumDiceOfK(dices, 1)
 	},
-	dc2: func(dices Dices) int {
+	Dc2: func(dices Dices) int {
 		return sumDiceOfK(dices, 2)
 	},
-	dc3: func(dices Dices) int {
+	Dc3: func(dices Dices) int {
 		return sumDiceOfK(dices, 3)
 	},
-	dc4: func(dices Dices) int {
+	Dc4: func(dices Dices) int {
 		return sumDiceOfK(dices, 4)
 	},
-	dc5: func(dices Dices) int {
+	Dc5: func(dices Dices) int {
 		return sumDiceOfK(dices, 5)
 	},
-	dc6: func(dices Dices) int {
+	Dc6: func(dices Dices) int {
 		return sumDiceOfK(dices, 6)
 	},
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"pactoule/party"
 
@@ -30,16 +31,16 @@ type model struct {
 	step     step
 	cursor   int      // which to-do menu item our cursor is pointing at
 	mainMenu []string // items on the menu
-	logs     string
+	logs     []string
 }
 
 var pactouleStyle = lipgloss.NewStyle().PaddingLeft(2).PaddingTop(1).PaddingBottom(5)
 
 func initialModel() model {
 	return model{
-		party:  nil,
+		party:  party.CreateParty(),
 		scores: make([]highScore, 0, 5),
-		step:   menu,
+		step:   play,
 		cursor: 0,
 		mainMenu: []string{
 			"Continue",
@@ -84,15 +85,18 @@ func controlMenu(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			switch m.cursor {
 			case newparty:
 				m.party = party.CreateParty()
-				m.logs += "-New-\n"
+				m.logs = append(m.logs, "-New-")
 				m.step = play
 			case play:
+				m.logs = append(m.logs, "-Continue-")
 				if m.party != nil {
 					m.step = play
 				}
 			case highscore:
+				m.logs = append(m.logs, "-High-")
 				m.step = highscore
 			default:
+				m.logs = append(m.logs, "-M-")
 				m.step = menu
 			}
 		}
@@ -144,14 +148,31 @@ func showMenu(m model) string {
 }
 
 func (m model) View() string {
+	var view string
 	switch m.step {
 	default:
-		return showMenu(m)
+		view = showMenu(m)
 	case play:
-		return showParty(m)
+		view = showParty(m)
 	case highscore:
-		return showHighscore(m)
+		view = showHighscore(m)
 	}
+
+	logtext := strings.Join(m.logs[max(0, len(m.logs)-10):], "\n")
+	logs := lipgloss.NewStyle().
+		Border(lipgloss.NormalBorder()).
+		BorderStyle(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		MarginLeft(5).
+		Render(
+			lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Render("logs:\n") + logtext,
+		)
+
+	return lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		view,
+		pactouleStyle.Render(logs),
+	)
 }
 
 func main() {

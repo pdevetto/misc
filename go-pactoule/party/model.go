@@ -1,27 +1,27 @@
 package party
 
 var (
-	Keys = []Key{bre, car, ful, psu, gsu, cha, pac, dpm, tt1,
-		dc1, dc2, dc3, dc4, dc5, dc6, bon, tt2, tot}
+	Keys = []Key{Bre, Car, Ful, Psu, Gsu, Cha, Pac, Dpm, Tt1,
+		Dc1, Dc2, Dc3, Dc4, Dc5, Dc6, Bon, Tt2, Tot}
 	Labels = map[Key]string{
-		bre: "Brelan",
-		car: "Carré",
-		ful: "Full",
-		psu: "Petite",
-		gsu: "Grande",
-		cha: "Chance",
-		pac: "Pactoule",
-		dpm: "DPM",
-		tt1: "Subtot 1",
-		dc1: "Uns",
-		dc2: "Deux",
-		dc3: "Trois",
-		dc4: "Quatre",
-		dc5: "Cinq",
-		dc6: "Six",
-		bon: "Bonus",
-		tt2: "Subtot 2",
-		tot: "Total",
+		Bre: "Brelan",
+		Car: "Carré",
+		Ful: "Full",
+		Psu: "Petite",
+		Gsu: "Grande",
+		Cha: "Chance",
+		Pac: "Pactoule",
+		Dpm: "DPM",
+		Tt1: "Subtot 1",
+		Dc1: "Uns",
+		Dc2: "Deux",
+		Dc3: "Trois",
+		Dc4: "Quatre",
+		Dc5: "Cinq",
+		Dc6: "Six",
+		Bon: "Bonus",
+		Tt2: "Subtot 2",
+		Tot: "Total",
 	}
 )
 
@@ -31,54 +31,55 @@ type Key int
 const (
 	START Step = iota
 	ROLL
-	bre Key = iota
-	car
-	ful
-	psu
-	gsu
-	cha
-	pac
-	dpm
-	tt1
-	dc1
-	dc2
-	dc3
-	dc4
-	dc5
-	dc6
-	bon
-	tt2
-	tot
+	MARK
+	Bre Key = iota
+	Car
+	Ful
+	Psu
+	Gsu
+	Cha
+	Pac
+	Dpm
+	Tt1
+	Dc1
+	Dc2
+	Dc3
+	Dc4
+	Dc5
+	Dc6
+	Bon
+	Tt2
+	Tot
 )
 
 func GetKey(cmd string) Key {
 	switch cmd {
 	case "bre":
-		return bre
+		return Bre
 	case "car":
-		return car
+		return Car
 	case "ful":
-		return ful
+		return Ful
 	case "psu":
-		return psu
+		return Psu
 	case "gsu":
-		return gsu
+		return Gsu
 	case "cha":
-		return cha
+		return Cha
 	case "pac":
-		return pac
+		return Pac
 	case "dc1":
-		return dc1
+		return Dc1
 	case "dc2":
-		return dc2
+		return Dc2
 	case "dc3":
-		return dc3
+		return Dc3
 	case "dc4":
-		return dc4
+		return Dc4
 	case "dc5":
-		return dc5
+		return Dc5
 	case "dc6":
-		return dc6
+		return Dc6
 	}
 	return 0
 }
@@ -97,10 +98,12 @@ type Score struct {
 	Precal int
 }
 type Party struct {
-	dices  []*Dice
-	scores map[Key]*Score
-	step   Step
-	roll   int
+	dices   []*Dice
+	scores  map[Key]*Score
+	step    Step
+	roll    int
+	maxroll int
+	maxdice int
 }
 
 func (p *Party) GetStep() Step {
@@ -113,4 +116,8 @@ func (p *Party) GetScores() map[Key]*Score {
 
 func (p *Party) GetDices() []*Dice {
 	return p.dices
+}
+
+func (p *Party) GetRoll() int {
+	return p.roll
 }

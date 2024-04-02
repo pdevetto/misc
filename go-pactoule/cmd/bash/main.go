@@ -142,7 +142,7 @@ func KeepRune(p *Party, dice rune) error {
 }
 
 func MarkRune(p *Party, tty *tty.TTY) error {
-	if p.GetStep() != ROLL {
+	if p.GetStep() != ROLL && p.GetStep() != MARK {
 		return fmt.Errorf("NOT THE RIGHT TIME TO MARK")
 	}
 	color.Cyan(" 1-6 > . | b > bre | c > car | f > ful | s > psu | g > gsu | h > cha | p > pac")
