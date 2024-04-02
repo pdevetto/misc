@@ -121,3 +121,7 @@ func (p *Party) GetDices() []*Dice {
 func (p *Party) GetRoll() int {
 	return p.roll
 }
+
+func (p *Party) GetMaxRoll() int {
+	return p.maxroll
+}

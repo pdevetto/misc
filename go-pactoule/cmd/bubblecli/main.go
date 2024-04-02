@@ -169,7 +169,7 @@ func (m model) View() string {
 		)
 
 	return lipgloss.JoinHorizontal(
-		lipgloss.Center,
+		lipgloss.Top,
 		view,
 		pactouleStyle.Render(logs),
 	)

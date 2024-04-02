@@ -1,9 +1,21 @@
 package main
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"fmt"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+)
 
 func showHighscore(m model) string {
-	return "party"
+	scores := []string{}
+	for _, highscore := range m.scores {
+		scores = append(scores, fmt.Sprintf("%v - %v", highscore.name, highscore.score))
+	}
+	return lipgloss.JoinVertical(
+		lipgloss.Top,
+		scores...,
+	)
 }
 
 func controlHighscore(msg tea.Msg, m model) (tea.Model, tea.Cmd) {

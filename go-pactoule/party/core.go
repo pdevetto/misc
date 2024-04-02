@@ -30,6 +30,10 @@ func CreateParty() *Party {
 }
 
 func (p *Party) Roll() error {
+	if p.step == ROLL && p.roll >= p.maxroll {
+		p.SwitchMark()
+		return nil
+	}
 	if (p.step != START && p.step != ROLL) || p.roll >= p.maxroll {
 		return fmt.Errorf("CAN'T ROLL NOW")
 	}
@@ -80,8 +84,19 @@ func (p *Party) setScore(key Key, val int) {
 	p.scores[key] = score
 }
 
+func (p *Party) SwitchMark() {
+	if p.step == ROLL {
+		p.step = MARK
+		return
+	}
+	if p.step == MARK {
+		p.step = ROLL
+		return
+	}
+}
+
 func (p *Party) Mark(cmd Key) error {
-	if p.step != ROLL {
+	if p.step != ROLL && p.step != MARK {
 		return fmt.Errorf("NOT THE RIGHT TIME TO MARK")
 	}
 	if p.scores[cmd].Set {
