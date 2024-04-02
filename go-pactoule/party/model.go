@@ -32,6 +32,7 @@ const (
 	START Step = iota
 	ROLL
 	MARK
+	FINISH
 	Bre Key = iota
 	Car
 	Ful
@@ -92,7 +93,6 @@ type Dices = []*Dice
 type Score struct {
 	Label  string
 	Key    Key
-	Lock   bool
 	Set    bool
 	Value  int
 	Precal int

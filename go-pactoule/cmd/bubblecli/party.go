@@ -34,6 +34,10 @@ func controlParty(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "esc":
 			m.step = menu
+			if m.party.GetStep() == party.FINISH {
+				m.scores = append(m.scores, highScore{"Piotr", m.party.GetScores()[party.Tot].Value})
+				m.party = nil
+			}
 		case "=":
 			colors = allcolors[rand.Intn(len(allcolors))]
 		case "up", "down":
@@ -44,12 +48,10 @@ func controlParty(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 				s += fmt.Sprintf("⚠️ %v", err)
 			}
 			m.logs = append(m.logs, s)
-		case "1", "2", "3", "4", "5", //"6", "7", "8", "9", "0",
-			"a", "z", "e", "r", "t": //"u", "i", "o", "p":
+		case "a", "z", "e", "r", "t", "y", "u", "i", "o":
 			s := "Keep: "
 			di := map[string]int{
-				"1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": -1, "7": -1, "8": -1, "9": -1, "0": -1,
-				"a": 0, "z": 1, "e": 2, "r": 3, "t": 4, "u": -1, "i": -1, "o": -1, "p": -1,
+				"a": 0, "z": 1, "e": 2, "r": 3, "t": 4, "y": 5, "u": 6, "i": 7, "o": 8,
 			}
 			if di[msg.String()] >= 0 {
 				if err := m.party.Keep(di[msg.String()]); err != nil {
@@ -61,17 +63,22 @@ func controlParty(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			m.party.SwitchMark()
 		case "alt":
 			m.party.SwitchMark()
-		default:
-			m.logs = append(m.logs, "Pressed:"+msg.String())
+		case "b", "c", "f", "s", "g", "h", "p", "1", "2", "3", "4", "5", "6":
 			if m.party.GetStep() == party.MARK {
 				err := m.party.Mark(subcmd[msg.String()])
 				if err != nil {
-					fmt.Printf("⚠️ couldn' mark : %v -> %v \n", err, subcmd)
+					m.logs = append(m.logs, fmt.Sprintf("⚠️ couldn' mark : %v -> %v \n", err, subcmd))
+				}
+				for _, ss := range m.party.GetScores() {
+					if !ss.Set {
+						m.logs = append(m.logs, fmt.Sprintf("Rest %v", ss.Label))
+						return m, nil
+					}
 				}
 			}
-
+		default:
+			m.logs = append(m.logs, "Pressed:"+msg.String())
 		}
-
 	}
 	return m, nil
 }
@@ -113,7 +120,7 @@ func showParty(m model) string {
 	playground = lipgloss.JoinVertical(
 		lipgloss.Center,
 		playground,
-		getHelpers(m.party.GetStep() == party.MARK),
+		getHelpers(m.party.GetStep()),
 	)
 
 	scoreTable := getScoreTable(m.party.GetScores(), m.party.GetStep())
@@ -126,8 +133,9 @@ func showParty(m model) string {
 }
 
 func getScoreTable(scores map[party.Key]*party.Score, step party.Step) string {
-	var precalStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(colors[2])).Align(lipgloss.Center)
-	var valueStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(colors[1]))
+	var precalStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(colors[1])).Align(lipgloss.Center).Render
+	var valueStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(colors[2])).Render
+	var preczStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("233")).Render
 
 	t := table.New().
 		Border(lipgloss.NormalBorder()).
@@ -136,7 +144,7 @@ func getScoreTable(scores map[party.Key]*party.Score, step party.Step) string {
 			switch {
 			case row == 0:
 				return lipgloss.NewStyle().Bold(true).
-					PaddingLeft(1).PaddingRight(1).Align(lipgloss.Center).
+					PaddingLeft(1).PaddingRight(3).
 					Foreground(lipgloss.Color(colors[1]))
 			default:
 				return lipgloss.NewStyle().
@@ -153,12 +161,19 @@ func getScoreTable(scores map[party.Key]*party.Score, step party.Step) string {
 			scores[party.Keys[i+9]],
 		} {
 			row = append(row, s.Label)
-			if !s.Set && !s.Lock && step != party.START {
-				row = append(row, precalStyle.Render(fmt.Sprintf("%d", s.Precal)))
-			} else if !s.Set && !s.Lock {
+			if !s.Set && step != party.START {
+				if s.Precal != 0 {
+					row = append(row, "> "+precalStyle(fmt.Sprintf("%2d", s.Precal)))
+				} else {
+					row = append(row, preczStyle(fmt.Sprintf("> %2d", s.Precal)))
+				}
+
+			} else if !s.Set {
 				row = append(row, "")
+			} else if s.Key == party.Bon && s.Precal != 0 && step != party.START {
+				row = append(row, valueStyle(fmt.Sprintf("%3d (-%d)", s.Value, s.Precal)))
 			} else {
-				row = append(row, valueStyle.Render(fmt.Sprintf("%d", s.Value)))
+				row = append(row, valueStyle(fmt.Sprintf("%3d", s.Value)))
 			}
 		}
 
@@ -204,7 +219,7 @@ func getStrDice(value int, lock bool) (string, lipgloss.Style) {
 	return svalue, style
 }
 
-func getHelpers(scores bool) string {
+func getHelpers(step party.Step) string {
 	//helpHeader := lipgloss.NewStyle().Foreground(lipgloss.Color("252"))
 	helpText := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#070606"))
@@ -238,7 +253,13 @@ func getHelpers(scores bool) string {
 	var listHelpers []string
 	var n1 int
 	var n2 int
-	if scores {
+	if step == party.FINISH {
+		listHelpers = []string{
+			"=", "esc", "q",
+		}
+		n1 = 3
+		n2 = 3
+	} else if step == party.MARK {
 		keyb["m"] = keyb["alt"]
 		listHelpers = []string{
 			"b", "c", "f", "s", "g", "h", "p",

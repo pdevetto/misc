@@ -27,16 +27,16 @@ func Print(p *Party) string {
 	for i := range 9 {
 		s1 := scores[Keys[i]]
 		s2 := scores[Keys[i+9]]
-		if !s1.Set && !s1.Lock && p.GetStep() != START {
+		if !s1.Set && p.GetStep() != START {
 			output += fmt.Sprintf("│ %-9v │ %v ║", s1.Label, colorPrecal(s1.Precal))
-		} else if !s1.Set && !s1.Lock {
+		} else if !s1.Set {
 			output += fmt.Sprintf("│ %-9v │     ║", s1.Label)
 		} else {
 			output += fmt.Sprintf("│ %-9v │ %3d ║", s1.Label, s1.Value)
 		}
-		if !s2.Set && !s2.Lock && p.GetStep() != START {
+		if !s2.Set && p.GetStep() != START {
 			output += fmt.Sprintf(" %-9v │ %s ║\n", s2.Label, colorPrecal(s2.Precal))
-		} else if !s2.Set && !s2.Lock {
+		} else if !s2.Set {
 			output += fmt.Sprintf(" %-9v │     ║\n", s2.Label)
 		} else {
 			output += fmt.Sprintf(" %-9v │ %3d ║\n", s2.Label, s2.Value)

@@ -1,20 +1,25 @@
 package party
 
 import (
-	"fmt"
 	"slices"
 )
 
 func (p *Party) Precalc() {
 	for _, s := range p.scores {
-		if !s.Set && !s.Lock {
+		if !s.Set {
 			p.scores[s.Key].Precal = funcalc[s.Key](p.dices)
+		}
+		if s.Key == Bon {
+			b := 0
+			for _, k := range []Key{Dc1, Dc2, Dc3, Dc4, Dc5, Dc6} {
+				b += p.scores[k].Value
+			}
+			p.scores[s.Key].Precal = max(0, 63-b)
 		}
 	}
 }
 
 func Compute(key Key, d []*Dice) int {
-	fmt.Printf("Compute it is %#v for key %v\n", d, key)
 	fun := funcalc[key]
 	return fun(d)
 }

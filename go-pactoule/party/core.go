@@ -6,17 +6,14 @@ import (
 )
 
 var (
-	maxroll = 3
+	maxroll = 20
 	maxdice = 6
+	nbdices = 5
 )
 
 func CreateParty() *Party {
-	dices := make([]*Dice, 0, 5)
-	for range 5 {
-		dices = append(dices, &Dice{})
-	}
 	p := Party{
-		dices,
+		nil,
 		make(map[Key]*Score),
 		START,
 		0,
@@ -24,9 +21,27 @@ func CreateParty() *Party {
 		maxdice,
 	}
 	for _, k := range Keys {
-		p.scores[k] = &Score{Labels[k], k, k == Dpm || k == Tt1 || k == Tt2 || k == Bon || k == Tot, false, 0, 0}
+		p.scores[k] = &Score{Labels[k], k, k == Dpm || k == Tt1 || k == Tt2 || k == Bon || k == Tot, 0, 0}
 	}
+	p.Reset()
 	return &p
+}
+
+func (p *Party) Reset() {
+	dices := make([]*Dice, 0, nbdices)
+	for range nbdices {
+		dices = append(dices, &Dice{})
+	}
+	p.dices = dices
+	p.step = START
+	p.roll = 0
+
+	for _, ss := range p.scores {
+		if !ss.Set {
+			return
+		}
+	}
+	p.step = FINISH
 }
 
 func (p *Party) Roll() error {
@@ -66,6 +81,9 @@ func (p *Party) Roll() error {
 func (p *Party) Keep(dice int) error {
 	if p.step != ROLL {
 		return fmt.Errorf("NOT THE RIGHT TIME TO KEEP")
+	}
+	if dice >= nbdices {
+		return nil
 	}
 
 	if p.dices[dice].Lock == 0 {
@@ -134,7 +152,7 @@ func (p *Party) Mark(cmd Key) error {
 
 	p.setScore(Tt2, dcsum+p.scores[Bon].Value)
 	p.setScore(Tot, p.scores[Tt1].Value+p.scores[Tt2].Value)
-	p.step = START
-	p.roll = 0
+
+	p.Reset()
 	return nil
 }
