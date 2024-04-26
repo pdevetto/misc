@@ -96,24 +96,31 @@ var allcolors = []color{
 	//[]string{"", "", "", "", ""},
 
 }
-var colors = allcolors[rand.Intn(len(allcolors))]
+var colors = allcolors[0] // rand.Intn(len(allcolors))
 
-func showParty(m model) string {
+func getHeader(roll int, maxroll int) string {
 	head := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(colors[0])).
 		Bold(true)
-	playground := head.Render("Pactoule") + "\n" +
+	return head.Render("Pactoule") + "\n" +
 		head.Copy().Background(lipgloss.Color(colors[0])).Render("   ") +
 		head.Copy().Background(lipgloss.Color(colors[1])).Render("   ") +
 		head.Copy().Background(lipgloss.Color(colors[2])).Render("   ") +
 		head.Copy().Background(lipgloss.Color(colors[3])).Render("   ") + "\n" +
-		head.Copy().Bold(false).Render(fmt.Sprintf("roll: %v/%v", m.party.GetRoll(), m.party.GetMaxRoll())) + "\n\n"
+		head.Copy().Bold(false).Render(fmt.Sprintf("roll: %v/%v", roll, maxroll)) + "\n\n"
+}
+
+func showParty(m model) string {
+	playground := getHeader(m.party.GetRoll(), m.party.GetMaxRoll())
+
 	strdices := []string{}
 
+	strdices = append(strdices, " < ")
 	for _, d := range m.party.GetDices() {
 		value, style := getStrDice(d.Value, d.Lock != 0)
 		strdices = append(strdices, style.Render(value))
 	}
+	strdices = append(strdices, " > ")
 
 	playground += lipgloss.JoinHorizontal(lipgloss.Center, strdices...) + "\n"
 
@@ -183,7 +190,7 @@ func getScoreTable(scores map[party.Key]*party.Score, step party.Step) string {
 }
 
 func getStrDice(value int, lock bool) (string, lipgloss.Style) {
-	styleDice := lipgloss.NewStyle().Padding(0, 2, 0, 1).BorderStyle(lipgloss.RoundedBorder()).
+	styleDice := lipgloss.NewStyle().Padding(0, 1, 0, 1).BorderStyle(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color(colors[0])).Foreground(lipgloss.Color(colors[0]))
 	styleDiceLock := styleDice.Copy().BorderForeground(lipgloss.Color(colors[3])).Foreground(lipgloss.Color(colors[3]))
 	style := styleDice
@@ -195,25 +202,25 @@ func getStrDice(value int, lock bool) (string, lipgloss.Style) {
 	// Try with ⚪ and ⚫ emoji instead of ⬤ (but after we successfully handle lock)
 	switch value {
 	case 1:
-		svalue = "     \n  ⬤  \n     "
+		svalue = "      \n  ⬤   \n      "
 	case 2:
-		svalue = "⬤    \n     \n    ⬤"
+		svalue = "⬤     \n      \n    ⬤ "
 	case 3:
-		svalue = "⬤    \n  ⬤  \n    ⬤"
+		svalue = "⬤     \n  ⬤   \n    ⬤ "
 	case 4:
-		svalue = "⬤   ⬤\n     \n⬤   ⬤"
+		svalue = "⬤   ⬤ \n      \n⬤   ⬤ "
 	case 5:
-		svalue = "⬤   ⬤\n  ⬤  \n⬤   ⬤"
+		svalue = "⬤   ⬤ \n  ⬤   \n⬤   ⬤ "
 	case 6:
-		svalue = "⬤   ⬤\n⬤   ⬤\n⬤   ⬤"
+		svalue = "⬤   ⬤ \n⬤   ⬤ \n⬤   ⬤ "
 	case 7:
-		svalue = "⬤   ⬤\n⬤ ⬤ ⬤\n⬤   ⬤"
+		svalue = "⬤   ⬤ \n⬤ ⬤ ⬤ \n⬤   ⬤ "
 	case 8:
-		svalue = "⬤ ⬤ ⬤\n⬤   ⬤\n⬤ ⬤ ⬤"
+		svalue = "⬤ ⬤ ⬤ \n⬤   ⬤ \n⬤ ⬤ ⬤ "
 	case 9:
-		svalue = "⬤ ⬤ ⬤\n⬤ ⬤ ⬤\n⬤ ⬤ ⬤"
+		svalue = "⬤ ⬤ ⬤ \n⬤ ⬤ ⬤ \n⬤ ⬤ ⬤ "
 	default:
-		svalue = "     \n  ❔ \n     "
+		svalue = "      \n  ❔  \n      "
 	}
 
 	return svalue, style
@@ -222,14 +229,14 @@ func getStrDice(value int, lock bool) (string, lipgloss.Style) {
 func getHelpers(step party.Step) string {
 	//helpHeader := lipgloss.NewStyle().Foreground(lipgloss.Color("252"))
 	helpText := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#070606"))
+		Foreground(lipgloss.Color("241"))
 	helpKey := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("254"))
 
 	keyb := map[string]string{
 		"q":   "quit",
 		"esc": "menu",
-		"=":   "(" + colors[4] + ")",
+		"=":   "colors",
 		" ":   " ",
 		"x":   "roll dice",
 		"m":   "mark score", // longest : 10 so %12v
@@ -277,7 +284,7 @@ func getHelpers(step party.Step) string {
 	helpers := []string{}
 
 	for _, key := range listHelpers {
-		helpers = append(helpers, helpKey.Render(fmt.Sprintf("%3v", key))+" "+helpText.Render(fmt.Sprintf("%-12v", keyb[key])))
+		helpers = append(helpers, helpKey.Render(fmt.Sprintf("%3v", key))+" "+helpText.Render(fmt.Sprintf("· %-12v", keyb[key])))
 	}
 
 	return lipgloss.JoinHorizontal(

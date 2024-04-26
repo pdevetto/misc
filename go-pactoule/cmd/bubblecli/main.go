@@ -38,8 +38,14 @@ var pactouleStyle = lipgloss.NewStyle().PaddingLeft(2).PaddingTop(1).PaddingBott
 
 func initialModel() model {
 	return model{
-		party:  party.CreateParty(),
-		scores: make([]highScore, 0, 5),
+		party: party.CreateParty(),
+		scores: []highScore{
+			{"Kwame", 500},
+			{"Wheeler", 400},
+			{"Linka", 300},
+			{"Gi", 250},
+			{"Ma-ti", 200},
+		},
 		step:   play,
 		cursor: 0,
 		mainMenu: []string{
