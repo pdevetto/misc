@@ -1,7 +1,7 @@
 import utils
 import collections
 
-data_ex= [
+data_ex = [
     "3   4",
     "4   3",
     "2   5",
@@ -11,22 +11,25 @@ data_ex= [
 ]
 data = utils.readfile("data/day01.txt")
 
+
 def day01(data):
-    l = list(map(lambda n: list(filter(None, n.split(' '))), data))
+    l = list(map(lambda n: list(filter(None, n.split(" "))), data))
 
     l1 = sorted(map(lambda n: int(n[0]), l))
     l2 = sorted(map(lambda n: int(n[1]), l))
 
     dist = 0
-    for i,n in enumerate(l1):
+    for i, n in enumerate(l1):
         dist += abs(n - l2[i])
     return dist
+
 
 assert day01(data_ex) == 11
 print(day01(data))
 
+
 def day01b(data):
-    l = list(map(lambda n: list(filter(None, n.split(' '))), data))
+    l = list(map(lambda n: list(filter(None, n.split(" "))), data))
 
     l1 = sorted(map(lambda n: int(n[0]), l))
     l2 = sorted(map(lambda n: int(n[1]), l))
@@ -36,6 +39,7 @@ def day01b(data):
     for n in l1:
         sim += n * cnt.get(n, 0)
     return sim
+
 
 assert day01b(data_ex) == 31
 print(day01b(data))

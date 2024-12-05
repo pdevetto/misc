@@ -8,8 +8,9 @@ def readfile(path):
 def dict_plusplus(data, i, val):
     if not i in data.keys():
         data[i] = 0
-    data[i]+= val
+    data[i] += val
     return data
+
 
 def dict_append(data, i, val):
     if not i in data.keys():
