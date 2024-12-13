@@ -17,3 +17,14 @@ def dict_append(data, i, val):
         data[i] = []
     data[i].append(val)
     return data
+
+def xy2k(x, y) -> str:
+    return f"{x}.{y}"
+
+
+def k2xy(k) -> tuple[int, int]:
+    return tuple(map(int, k.split(".")))
+
+def k_delta(k, delta):
+    x, y = k2xy(k)
+    return xy2k(x + delta[0], y + delta[1])

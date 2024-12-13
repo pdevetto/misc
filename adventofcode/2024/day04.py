@@ -96,7 +96,7 @@ data_ex4 = [
 
 def is_xmas_from_A(data, x, y):
     maxx = len(data) - 1
-    maxy = len(data[0]) - 1    
+    maxy = len(data[0]) - 1
     if x < 1 or y < 1 or x >= maxx or y >= maxy:
         return False
     count = 0
@@ -123,6 +123,7 @@ def day04_B(data):
                 sum += 1 if is_xmas_from_A(data, x, y) else 0
 
     return sum
+
 
 assert day04_B(data_ex4) == 9
 print(day04_B(data))

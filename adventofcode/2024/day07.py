@@ -13,6 +13,7 @@ data_ex = [
 ]
 data = utils.readfile("data/day07.txt")
 
+
 def calibr8(result, numbers, third=False):
     calculus = [numbers[0]]
     for numb in numbers[1:]:
@@ -34,6 +35,7 @@ def calibr8(result, numbers, third=False):
         calculus = calculus_next
     return calculus.count(result)
 
+
 assert calibr8(190, [10, 19]) == 1
 assert calibr8(3267, [81, 40, 27]) == 2
 assert calibr8(292, [11, 6, 16, 20]) == 1
@@ -46,20 +48,23 @@ assert calibr8(7290, [6, 8, 6, 15], True) == 1
 assert calibr8(192, [17, 8, 14]) == 0
 assert calibr8(192, [17, 8, 14], True) == 1
 
+
 def day07(data, third=False):
     sum_calculus = 0
     for line in data:
         result, numbers = line.split(":")
         result = int(result)
-        numbers = list(map(lambda ns: int(ns.strip()), filter(None, numbers.split(" "))))
+        numbers = list(
+            map(lambda ns: int(ns.strip()), filter(None, numbers.split(" ")))
+        )
         if calibr8(result, numbers, third) > 0:
             sum_calculus += result
     print(sum_calculus)
     return sum_calculus
-    
 
-assert(day07(data_ex)) == 3749
+
+assert (day07(data_ex)) == 3749
 print(day07(data))
 
-assert(day07(data_ex, True)) == 11387
+assert (day07(data_ex, True)) == 11387
 print(day07(data, True))
